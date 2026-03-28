@@ -1,22 +1,91 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Money11 Fantasy Cricket</title>
 <style>
-body { font-family: Arial; background:#f0f0f0; margin:0; padding:0; }
-header { background:#d32f2f; color:white; text-align:center; padding:15px; }
-.container { padding:10px; max-width:600px; margin:auto; }
-.player { background:white; margin:5px; padding:10px; border-radius:5px; cursor:pointer; }
-.selected { background:lightgreen; }
-button { width:100%; padding:10px; background:green; color:white; border:none; margin-top:10px; cursor:pointer; font-size:16px; }
-.section { background:white; margin-top:10px; padding:10px; border-radius:5px; }
-ul { list-style:none; padding:0; }
-li { margin:5px 0; }
+body {
+    font-family: Arial; 
+    background:#f5f5f5; 
+    margin:0; 
+    padding:0;
+}
+header {
+    background:#FF9933; /* Bhagwa */
+    color:white; 
+    text-align:center; 
+    padding:15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.container {
+    padding:15px; 
+    max-width:600px; 
+    margin:auto;
+}
+.section {
+    background:black;
+    color:white;
+    margin-top:10px; 
+    padding:15px; 
+    border-radius:10px;
+    box-shadow:0 4px 8px rgba(0,0,0,0.3);
+}
+.player {
+    background:white;
+    color:black;
+    margin:5px; 
+    padding:10px; 
+    border-radius:5px; 
+    cursor:pointer; 
+    box-shadow:0 2px 5px rgba(0,0,0,0.2);
+}
+.player.selected {
+    background:#FF9933; 
+    color:white;
+}
+button {
+    width:100%; 
+    padding:12px; 
+    background:#FF9933; 
+    color:white; 
+    border:none; 
+    margin-top:10px; 
+    cursor:pointer; 
+    font-size:16px;
+    box-shadow:0 4px 6px rgba(0,0,0,0.3);
+}
+input[type="text"] {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
+.login-section { 
+    background:white; 
+    color:black;
+    padding:20px; 
+    border-radius:10px; 
+    box-shadow:0 4px 6px rgba(0,0,0,0.3); 
+    max-width:400px; 
+    margin:50px auto; 
+    text-align:center;
+}
+.hidden { display:none; }
 </style>
 </head>
 <body>
 
+<!-- Login Section -->
+<div id="loginDiv" class="login-section">
+    <h2>Login to Money11</h2>
+    <input type="text" id="username" placeholder="Enter your name">
+    <button onclick="login()">Start Game</button>
+</div>
+
+<!-- Main App -->
+<div id="appDiv" class="hidden">
 <header>
 <h1>🏏 Money11 Fantasy Cricket</h1>
 <p>India vs Australia</p>
@@ -40,10 +109,20 @@ li { margin:5px 0; }
     <ul id="leaderboard"></ul>
   </div>
 </div>
+</div>
 
 <script>
-const players = ["Virat Kohli","Rohit Sharma","Dhoni","KL Rahul","Hardik Pandya","Ravindra Jadeja","Bumrah","Shami","Gill","Steve Smith","David Warner","Maxwell","Pat Cummins"];
+let username="";
+function login(){
+    username = document.getElementById("username").value.trim();
+    if(username==""){ alert("Enter your name"); return; }
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("appDiv").classList.remove("hidden");
+    alert("Welcome "+username+"! Select your team");
+}
 
+// Players
+const players = ["Virat Kohli","Rohit Sharma","Dhoni","KL Rahul","Hardik Pandya","Ravindra Jadeja","Bumrah","Shami","Gill","Steve Smith","David Warner","Maxwell","Pat Cummins"];
 let selected = [];
 let leaderboard = [];
 
@@ -86,7 +165,7 @@ function joinContest(){
   if(selected.length<11){ alert("Select 11 players first"); return; }
   let points = 0;
   selected.forEach(()=> points += Math.floor(Math.random()*100));
-  leaderboard.push({team:[...selected], points});
+  leaderboard.push({team:[...selected], points, user:username});
   leaderboard.sort((a,b)=>b.points-a.points);
   updateLeaderboard();
   alert("Contest Joined! Points: "+points);
@@ -96,7 +175,7 @@ function updateLeaderboard(){
   leaderboardUl.innerHTML="";
   leaderboard.forEach((entry,i)=>{
     let li=document.createElement("li");
-    li.innerText = "Rank "+(i+1)+" - "+entry.points+" pts";
+    li.innerText = (i+1)+". "+entry.user+" - "+entry.points+" pts";
     leaderboardUl.appendChild(li);
   });
 }
