@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Money11 Fantasy Cricket</title>
+<style>
+body { font-family: Arial; background:#f5f5f5; margin:0; padding:0; }
+header { background:#FF9933; color:white; text-align:center; padding:15px; box-shadow:0 4px 6px rgba(0,0,0,0.3);}
+.container { padding:15px; max-width:600px; margin:auto;}
+.section { background:black; color:white; margin-top:10px; padding:15px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.3);}
+.player { background:white; color:black; margin:5px; padding:10px; border-radius:5px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+.player.selected { background:#FF9933; color:white;}
+button { width:100%; padding:12px; background:#FF9933; color:white; border:none; margin-top:10px; cursor:pointer; font-size:16px; box-shadow:0 4px 6px rgba(0,0,0,0.3);}
+input[type="text"] { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #ccc;}
+.login-section { background:white; color:black; padding:20px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.3); max-width:400px; margin:50px auto; text-align:center;}
+.hidden { display:none; }
+.contest { background:white; color:black; margin:5px 0; padding:10px; border-radius:5px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+.contest:hover { background:#FF9933; color:white;}
+</style>
+</head>
+<body>
+
+<!-- Login Section -->
+<div id="loginDiv" class="login-section">
+    <h2>Login to Money11</h2>
+    <input type="text" id="username" placeholder="Enter your name">
+    <button onclick="login()">Start Game</button>
+</div>
+
+<!-- Main App -->
+<div id="appDiv" class="hidden">
+<header>
+<h1>🏏 Money11 Fantasy Cricket</h1>
+<p>India vs Australia</p>
+</header>
+
+<div class="container">
+  <div class="section">
+    <h3>Select Players (Max 11)</h3>
+    <div id="players"></div>
+  </div>
+
+  <div class="section">
+    <h3>Dream11-style Contests</h3>
+    <div id="contestList"></div>
+  </div>
+
+  <div class="section">
+    <h3>Your Team (<span id="count">0</span>/11)</h3>
+    <ul id="team"></ul>
+  </div>
+
+  <button onclick="joinContest()">Join Selected Contest</button>
+
+  <div class="section">
+    <h3>Leaderboard</h3>
+    <ul id="leaderboard"></ul>
+  </div>
+</div>
+</div>
+
+<script>
+let username="";
+function login(){
+    username = document.getElementById("username").value.trim();
+    if(username==""){ alert("Enter your name"); return; }
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("appDiv").classList.remove("hidden");
+    alert("Welcome "+username+"! Select your team");
+}
+
+// Players
+const players = ["Virat Kohli","Rohit Sharma","Dhoni","KL Rahul","Hardik Pandya","Ravindra Jadeja","Bumrah","Shami","Gill","Steve Smith","David Warner","Maxwell","Pat Cummins"];
+let selected = [];
+let leaderboard = [];
+let selectedContest = null;
+
+const playersDiv = document.getElementById("players");
+const teamUl = document.getElementById("team");
+const count = document.getElementById("count");
+const leaderboardUl = document.getElementById("leaderboard");
+const contestList = document.getElementById("contestList");
+
+// Player selection
+players.forEach(name=>{
+  let div=document.createElement("div");
+  div.className="player";
+  div.innerText=name;
+
+  div.onclick=()=>{
+    if(selected.includes(name)){
+      selected = selected.filter(p=>p!=name);
+      div.classList.remove("selected");
+    } else {
+      if(selected.length>=11){ alert("Max 11 players"); return; }
+      selected.push(name);
+      div.classList.add("selected");
+    }
+    updateTeam();
+  };
+
+  playersDiv.appendChild(div);
+});
+
+function updateTeam(){
+  teamUl.innerHTML="";
+  selected.forEach(p=>{
+    let li=document.createElement("li");
+    li.innerText=p;
+    teamUl.appendChild(li);
+  });
+  count.innerText = selected.length;
+}
+
+// Contests (Dream11 style)
+const contests = [
+  {id:1, name:"Mini Contest", entry:10, prize:50},
+  {id:2, name:"Mega Contest", entry:50, prize:500},
+  {id:3, name:"Ultimate Contest", entry:100, prize:1200}
+];
+
+contests.forEach(c=>{
+  let div = document.createElement("div");
+  div.className="contest";
+  div.innerText = c.name+" - Entry ₹"+c.entry+" | Prize ₹"+c.prize;
+  div.onclick=()=>{
+    selectedContest = c;
+    alert("Selected "+c.name+"! Entry ₹"+c.entry);
+  };
+  contestList.appendChild(div);
+});
+
+// Join Contest
+function joinContest(){
+  if(!selectedContest){ alert("Select a contest first"); return; }
+  if(selected.length<11){ alert("Select 11 players first"); return; }
+
+  let points = 0;
+  selected.forEach(()=> points += Math.floor(Math.random()*100));
+  leaderboard.push({team:[...selected], points, user:username, contest:selectedContest.name});
+  leaderboard.sort((a,b)=>b.points-a.points);
+  updateLeaderboard();
+  alert("Joined "+selectedContest.name+"! Points: "+points);
+}
+
+function updateLeaderboard(){
+  leaderboardUl.innerHTML="";
+  leaderboard.forEach((entry,i)=>{
+    let li=document.createElement("li");
+    li.innerText = (i+1)+". "+entry.user+" ("+entry.contest+") - "+entry.points+" pts";
+    leaderboardUl.appendChild(li);
+  });
+}
+</script>
+
+</body>
+</html>
